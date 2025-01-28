@@ -1,0 +1,22 @@
+/* src/components/Header.module.css */
+.header {
+    background-color: #333;
+    padding: 1rem;
+  }
+  
+  .navList {
+    list-style-type: none;
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .navList li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  .navList li a:hover {
+    color: #ff6347;
+  }
+  
