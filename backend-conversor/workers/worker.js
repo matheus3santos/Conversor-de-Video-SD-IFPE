@@ -1,3 +1,5 @@
+// workers/worker.js
+
 const { VideoQueue, logger } = require('../services/messageQueue');
 const { executeFFmpeg, cleanupTempFile } = require('../utils/videoProcessing');
 

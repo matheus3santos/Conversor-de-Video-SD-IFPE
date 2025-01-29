@@ -1,1 +1,9 @@
 {"code":"ECONNREFUSED","level":"error","message":"Erro ao inicializar sistema de filas:","stack":"AggregateError\n    at internalConnectMultiple (node:net:1114:18)\n    at afterConnectMultiple (node:net:1667:5)","timestamp":"2025-01-29T20:44:50.396Z"}
+{"level":"info","message":"Sistema de filas inicializado com sucesso","timestamp":"2025-01-29T20:53:13.344Z"}
+{"level":"info","message":"Sistema de filas inicializado com sucesso","timestamp":"2025-01-29T21:13:54.398Z"}
+{"level":"info","message":"Sistema de filas inicializado com sucesso","timestamp":"2025-01-29T21:16:12.877Z"}
+{"level":"info","message":"Sistema de filas inicializado com sucesso","timestamp":"2025-01-29T21:18:32.214Z"}
+{"level":"info","message":"Sistema de filas inicializado com sucesso","timestamp":"2025-01-29T21:20:02.265Z"}
+{"level":"info","message":"Sistema de filas inicializado com sucesso","timestamp":"2025-01-29T21:37:33.171Z"}
+{"level":"info","message":"Sistema de filas inicializado com sucesso","timestamp":"2025-01-29T21:37:55.011Z"}
+{"level":"info","message":"Sistema de filas inicializado com sucesso","timestamp":"2025-01-29T21:38:18.079Z"}

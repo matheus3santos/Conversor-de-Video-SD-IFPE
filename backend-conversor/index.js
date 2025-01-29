@@ -7,7 +7,7 @@ const videoQueue = new VideoQueue();
 
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT;
 
 // Middleware
 app.use(cors()); // Habilita CORS
@@ -71,8 +71,3 @@ process.on('SIGTERM', async () => {
   process.exit(0);
 });
 
-// Inicialização do servidor
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
-  console.log(`Ambiente: ${process.env.NODE_ENV || 'development'}`);
-});
