@@ -49,7 +49,6 @@ const UploadScreen = () => {
 
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("inputFormat", fileExtension);
     formData.append("outputFormat", selectedFormat);
 
     try {
@@ -58,6 +57,7 @@ const UploadScreen = () => {
         message: "Enviando arquivo...",
       });
 
+      // Envia o arquivo para o back-end
       const response = await axios.post(`${API_BASE_URL}/api/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
         onUploadProgress: (progressEvent) => {
@@ -71,17 +71,64 @@ const UploadScreen = () => {
         },
       });
 
+      // Atualiza o status para "conversão em andamento"
       setUploadStatus({
-        status: "success",
-        message: "Arquivo convertido com sucesso!",
+        status: "converting",
+        message: "Conversão em andamento...",
       });
-      setDownloadUrl(response.data.downloadUrl);
+
+      // Obtém o jobId da resposta
+      const { jobId } = response.data;
+
+      // Verifica o status da conversão
+      await checkConversionStatus(jobId);
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.error || "Falha no envio do arquivo. Tente novamente.";
       setUploadStatus({
         status: "error",
         message: errorMessage,
+      });
+    }
+  };
+
+  const checkConversionStatus = async (jobId: string) => {
+    try {
+      let attempts = 0;
+      const maxAttempts = 30; // Número máximo de tentativas
+      const interval = 5000; // Intervalo de 5 segundos
+
+      const checkStatus = async () => {
+        const response = await axios.get(`${API_BASE_URL}/api/status/${jobId}`);
+        const { status, downloadUrl } = response.data;
+
+        if (status === "completed") {
+          setUploadStatus({
+            status: "success",
+            message: "Arquivo convertido com sucesso!",
+          });
+          setDownloadUrl(downloadUrl);
+        } else if (status === "failed") {
+          setUploadStatus({
+            status: "error",
+            message: "Falha na conversão do arquivo.",
+          });
+        } else if (attempts < maxAttempts) {
+          attempts++;
+          setTimeout(checkStatus, interval); // Verifica novamente após o intervalo
+        } else {
+          setUploadStatus({
+            status: "error",
+            message: "Tempo limite excedido para a conversão.",
+          });
+        }
+      };
+
+      await checkStatus();
+    } catch (error: any) {
+      setUploadStatus({
+        status: "error",
+        message: "Erro ao verificar o status da conversão.",
       });
     }
   };
@@ -102,6 +149,8 @@ const UploadScreen = () => {
           return <AlertCircle className="w-5 h-5" />;
         case "success":
           return <CheckCircle2 className="w-5 h-5" />;
+        case "converting":
+          return <Upload className="w-5 h-5 animate-pulse" />;
         default:
           return <Upload className="w-5 h-5 animate-pulse" />;
       }
@@ -109,9 +158,8 @@ const UploadScreen = () => {
 
     return (
       <div
-        className={`mb-4 p-3 rounded-md border flex items-center gap-2 ${
-          statusStyles[uploadStatus.status]
-        }`}
+        className={`mb-4 p-3 rounded-md border flex items-center gap-2 ${statusStyles[uploadStatus.status]
+          }`}
       >
         <StatusIcon />
         <span>{uploadStatus.message}</span>
@@ -170,16 +218,15 @@ const UploadScreen = () => {
           <button
             onClick={handleUpload}
             disabled={uploadStatus.status === "uploading"}
-            className={`w-full py-2 px-4 rounded-md text-white font-semibold ${
-              uploadStatus.status === "uploading"
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-blue-500 hover:bg-blue-600"
-            }`}
+            className={`w-full py-2 px-4 rounded-md text-white font-semibold ${uploadStatus.status === "uploading"
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-500 hover:bg-blue-600"
+              }`}
           >
             {uploadStatus.status === "uploading" ? "Enviando..." : "Enviar Arquivo"}
           </button>
 
-          {downloadUrl && (
+          {downloadUrl && uploadStatus.status === "success" && (
             <a
               href={downloadUrl}
               className="mt-4 inline-block w-full text-center py-2 px-4 rounded-md bg-green-500 text-white font-semibold hover:bg-green-600"

@@ -7,17 +7,15 @@ const {
   generateBlobSASQueryParameters,
   BlobSASPermissions
 } = require('@azure/storage-blob');
-const { exec } = require('child_process');
 const path = require('path');
 const fs = require('fs').promises;
 const { existsSync } = require('fs');
+const videoQueue = require('../services/messageQueue'); // Importação corrigida
 
 // Configuração do Azure Blob Storage
 const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
 const accountKey = process.env.AZURE_STORAGE_ACCOUNT_KEY;
 const containerName = process.env.AZURE_STORAGE_CONTAINER_NAME || 'videos-si';
-const FFMPEG_PATH = process.env.FFMPEG_PATH || 'ffmpeg'; // Permite configurar via variável de ambiente
-
 
 // Criar credencial com chave de conta
 const sharedKeyCredential = new StorageSharedKeyCredential(
@@ -35,7 +33,6 @@ const blobServiceClient = new BlobServiceClient(
 const storage = multer.diskStorage({
   destination: 'temp/',
   filename: (req, file, cb) => {
-    // Garantir nome de arquivo seguro
     const safeName = file.originalname.replace(/[^a-zA-Z0-9.]/g, '-');
     cb(null, `${Date.now()}-${safeName}`);
   }
@@ -68,7 +65,7 @@ async function generateSasUrl(containerClient, blobName) {
   const expiresOn = new Date(startsOn);
   expiresOn.setHours(startsOn.getHours() + 24);
 
-  const permissions = BlobSASPermissions.parse("racwd"); // Todas as permissões necessárias
+  const permissions = BlobSASPermissions.parse("racwd");
 
   const sasOptions = {
     containerName,
@@ -86,31 +83,11 @@ async function generateSasUrl(containerClient, blobName) {
   return `${blobClient.url}?${sasToken}`;
 }
 
-// Função para verificar se o FFmpeg está instalado
-async function checkFFmpeg() {
-  return new Promise((resolve, reject) => {
-    exec(`${FFMPEG_PATH} -version`, (error) => {
-      if (error) {
-        reject(new Error('FFmpeg não está instalado ou não está configurado corretamente no PATH'));
-      } else {
-        resolve(true);
-      }
-    });
-  });
-}
-
 // Função para inicializar o container
 async function initializeContainer() {
   try {
     const containerClient = blobServiceClient.getContainerClient(containerName);
-    const createContainerResponse = await containerClient.createIfNotExists({
-      access: 'container' // Permite acesso público ao container
-    });
-
-    if (createContainerResponse.succeeded) {
-      console.log(`Container ${containerName} criado com sucesso`);
-    }
-
+    await containerClient.createIfNotExists({ access: 'container' });
     return containerClient;
   } catch (error) {
     console.error(`Erro ao inicializar container: ${error.message}`);
@@ -130,44 +107,7 @@ async function cleanupTempFile(filePath) {
   }
 }
 
-// Executar FFmpeg
-// function executeFFmpeg(inputPath, outputPath) {
-//   return new Promise((resolve, reject) => {
-//     const ffmpegCommand = `ffmpeg -i "${inputPath}" -y "${outputPath}"`;
-//     exec(ffmpegCommand, (error, stdout, stderr) => {
-//       if (error) {
-//         reject(error);
-//       } else {
-//         resolve({ stdout, stderr });
-//       }
-//     });
-//   });
-// }
-
-// Função para executar FFmpeg
-function executeFFmpeg(inputPath, outputPath) {
-  return new Promise((resolve, reject) => {
-    // Corrigir os caminhos para o formato Windows
-    const inputPathFixed = inputPath.replace(/\\/g, '\\\\');
-    const outputPathFixed = outputPath.replace(/\//g, '\\');
-
-    const ffmpegCommand = `${FFMPEG_PATH} -i "${inputPathFixed}" -y "${outputPathFixed}"`;
-    console.log('Executando comando:', ffmpegCommand);
-
-    exec(ffmpegCommand, (error, stdout, stderr) => {
-      if (error) {
-        console.error('Erro FFmpeg:', error);
-        console.error('FFmpeg stderr:', stderr);
-        reject(error);
-      } else {
-        resolve({ stdout, stderr });
-      }
-    });
-  });
-}
-
-
-
+// Rota de upload
 router.post('/upload', upload.single('file'), async (req, res) => {
   const file = req.file;
   const { outputFormat } = req.body;
@@ -185,16 +125,13 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     });
   }
 
-  const convertedFilePath = `temp/converted-${file.filename}.${outputFormat}`;
-
   try {
     // Inicializar container
     const containerClient = await initializeContainer();
-
-    // Upload do arquivo original
     const blobName = `${Date.now()}-${path.basename(file.originalname)}`;
     const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
+    // Upload do arquivo original
     await blockBlobClient.uploadFile(file.path, {
       blobHTTPHeaders: {
         blobContentType: `video/${outputFormat}`
@@ -203,31 +140,19 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 
     console.log(`Arquivo enviado para Azure Blob Storage: ${blobName}`);
 
-    // Conversão do arquivo
-    await executeFFmpeg(file.path, convertedFilePath);
-    console.log('Conversão concluída com sucesso');
-
-    // Upload do arquivo convertido
-    const convertedBlobName = `converted-${blobName}.${outputFormat}`;
-    const convertedBlockBlobClient = containerClient.getBlockBlobClient(convertedBlobName);
-
-    await convertedBlockBlobClient.uploadFile(convertedFilePath, {
-      blobHTTPHeaders: {
-        blobContentType: `video/${outputFormat}`
-      }
+    // Enfileirar job de conversão
+    const jobId = await videoQueue.publishVideo({
+      inputPath: file.path,
+      outputFormat,
+      blobName,
+      originalName: file.originalname
     });
 
-    // Gerar URL com SAS token
-    const downloadUrl = await generateSasUrl(containerClient, convertedBlobName);
-
-    // Limpar arquivos temporários
-    await cleanupTempFile(file.path);
-    await cleanupTempFile(convertedFilePath);
-
+    // Retornar jobId para o front-end
     res.json({
       success: true,
-      downloadUrl,
-      message: 'Arquivo convertido com sucesso'
+      jobId, // Adicionado jobId na resposta
+      message: 'Arquivo recebido e conversão iniciada'
     });
 
   } catch (error) {
@@ -235,10 +160,39 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 
     // Limpar arquivos temporários em caso de erro
     await cleanupTempFile(file.path);
-    await cleanupTempFile(convertedFilePath);
 
     res.status(500).json({
       error: 'Erro durante o processamento do arquivo.',
+      details: error.message
+    });
+  }
+});
+
+router.get('/status/:jobId', async (req, res) => {
+  const { jobId } = req.params;
+
+  try {
+    // Verifica o status do job (implemente essa lógica conforme necessário)
+    const jobStatus = await videoQueue.getJobStatus(jobId);
+
+    if (jobStatus.status === "completed") {
+      res.json({
+        status: "completed",
+        downloadUrl: jobStatus.downloadUrl,
+      });
+    } else if (jobStatus.status === "failed") {
+      res.json({
+        status: "failed",
+        error: jobStatus.error,
+      });
+    } else {
+      res.json({
+        status: "processing",
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      error: 'Erro ao verificar o status do job.',
       details: error.message
     });
   }
