@@ -1,10 +1,9 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Header from "../../components/headerBar";
-import { AlertCircle, CheckCircle2, Upload } from "lucide-react";
+import { AlertCircle, CheckCircle2, Upload, FileIcon } from "lucide-react";
 
-// Configuração da URL base do backend
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 interface UploadStatus {
@@ -21,20 +20,36 @@ const UploadScreen = () => {
     status: "idle",
     message: "",
   });
+  const [abortController, setAbortController] = useState<AbortController | null>(null);
 
-  // Formatos disponíveis para conversão
   const conversionOptions = ["mp3", "mp4", "avi", "wav", "mkv"];
+  const validExtensions = ["mp4", "avi", "mkv", "wav", "mp3"];
+  const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
+      if (selectedFile.size > MAX_FILE_SIZE) {
+        setUploadStatus({
+          status: "error",
+          message: "O arquivo é muito grande. O limite é 100MB.",
+        });
+        return;
+      }
+
+      const extension = selectedFile.name.split(".").pop()?.toLowerCase() || "";
+      if (!validExtensions.includes(extension)) {
+        setUploadStatus({
+          status: "error",
+          message: "Formato de arquivo não suportado.",
+        });
+        return;
+      }
+
       setFile(selectedFile);
+      setFileExtension(extension);
       setDownloadUrl(null);
       setUploadStatus({ status: "idle", message: "" });
-
-      // Identificar extensão do arquivo
-      const extension = selectedFile.name.split(".").pop()?.toLowerCase() || "";
-      setFileExtension(extension);
     }
   };
 
@@ -51,6 +66,10 @@ const UploadScreen = () => {
     formData.append("file", file);
     formData.append("inputFormat", fileExtension);
     formData.append("outputFormat", selectedFormat);
+
+    console.log("Enviando arquivo:", file);
+    console.log("Formato de entrada:", fileExtension);
+    console.log("Formato de saída:", selectedFormat);
 
     try {
       setUploadStatus({
@@ -71,14 +90,41 @@ const UploadScreen = () => {
         },
       });
 
+      console.log("Resposta do servidor:", response.data);
+
       setUploadStatus({
-        status: "success",
-        message: "Arquivo convertido com sucesso!",
+        status: "converting",
+        message: "Arquivo enviado! Convertendo...",
       });
-      setDownloadUrl(response.data.downloadUrl);
+
+      // const conversionId = response.data.conversionId;
+      // const checkStatusInterval = setInterval(async () => {
+      //   const statusResponse = await axios.get(`${API_BASE_URL}/api/status/${conversionId}`);
+      //   if (statusResponse.data.status === "completed") {
+      //     clearInterval(checkStatusInterval);
+      //     setUploadStatus({
+      //       status: "success",
+      //       message: "Arquivo convertido com sucesso!",
+      //     });
+      //     setDownloadUrl(statusResponse.data.downloadUrl);
+      //   } else if (statusResponse.data.status === "failed") {
+      //     clearInterval(checkStatusInterval);
+      //     setUploadStatus({
+      //       status: "error",
+      //       message: "Falha na conversão do arquivo.",
+      //     });
+      //   }
+      // }, 4000);
     } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.error || "Falha no envio do arquivo. Tente novamente.";
+      console.error("Erro ao enviar arquivo:", error);
+      let errorMessage = "Falha no envio do arquivo. Tente novamente.";
+      if (error.response) {
+        if (error.response.status === 413) {
+          errorMessage = "O arquivo é muito grande. O limite é 100MB.";
+        } else if (error.response.status === 400) {
+          errorMessage = "Formato de arquivo não suportado.";
+        }
+      }
       setUploadStatus({
         status: "error",
         message: errorMessage,
@@ -86,38 +132,19 @@ const UploadScreen = () => {
     }
   };
 
-  const StatusMessage = () => {
-    if (uploadStatus.status === "idle") return null;
+  const handleCancelUpload = () => {
+    if (abortController) {
+      abortController.abort();
+    }
+  };
 
-    const statusStyles = {
-      error: "bg-red-100 text-red-800 border-red-300",
-      success: "bg-green-100 text-green-800 border-green-300",
-      uploading: "bg-blue-100 text-blue-800 border-blue-300",
-      converting: "bg-yellow-100 text-yellow-800 border-yellow-300",
-    };
-
-    const StatusIcon = () => {
-      switch (uploadStatus.status) {
-        case "error":
-          return <AlertCircle className="w-5 h-5" />;
-        case "success":
-          return <CheckCircle2 className="w-5 h-5" />;
-        default:
-          return <Upload className="w-5 h-5 animate-pulse" />;
+  useEffect(() => {
+    return () => {
+      if (abortController) {
+        abortController.abort();
       }
     };
-
-    return (
-      <div
-        className={`mb-4 p-3 rounded-md border flex items-center gap-2 ${
-          statusStyles[uploadStatus.status]
-        }`}
-      >
-        <StatusIcon />
-        <span>{uploadStatus.message}</span>
-      </div>
-    );
-  };
+  }, [abortController]);
 
   return (
     <div>
@@ -128,39 +155,34 @@ const UploadScreen = () => {
             Upload e Conversão de Arquivo
           </h1>
 
-          <StatusMessage />
+          {uploadStatus.status !== "idle" && (
+            <div className={`mb-4 p-3 rounded-md border flex items-center gap-2`}>
+              {uploadStatus.status === "error" && <AlertCircle className="w-5 h-5 text-red-600" />}
+              {uploadStatus.status === "success" && <CheckCircle2 className="w-5 h-5 text-green-600" />}
+              {uploadStatus.status === "uploading" && <Upload className="w-5 h-5 animate-pulse text-blue-600" />}
+              <span>{uploadStatus.message}</span>
+            </div>
+          )}
 
           <input
             type="file"
             onChange={handleFileChange}
             className="mb-4 w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200"
-            accept={conversionOptions.map((format) => `.${format}`).join(",")}
           />
 
-          {fileExtension && (
-            <p className="mb-4 text-sm text-gray-600">
-              Tipo de arquivo detectado:{" "}
-              <span className="font-semibold">{fileExtension}</span>
-            </p>
+          {file && (
+            <div className="mb-4 flex items-center gap-2">
+              <FileIcon className="w-5 h-5" />
+              <span>{file.name}</span>
+            </div>
           )}
 
           <div className="mb-4">
-            <p className="text-sm font-semibold mb-2">
-              Escolha o formato de conversão:
-            </p>
+            <p className="text-sm font-semibold mb-2">Escolha o formato de conversão:</p>
             <div className="grid grid-cols-2 gap-2">
               {conversionOptions.map((format) => (
-                <label
-                  key={format}
-                  className="flex items-center p-2 border rounded-md hover:bg-gray-50 cursor-pointer"
-                >
-                  <input
-                    type="radio"
-                    name="conversionFormat"
-                    value={format}
-                    onChange={() => setSelectedFormat(format)}
-                    className="mr-2"
-                  />
+                <label key={format} className="flex items-center p-2 border rounded-md hover:bg-gray-50 cursor-pointer">
+                  <input type="radio" name="conversionFormat" value={format} onChange={() => setSelectedFormat(format)} className="mr-2" />
                   {format.toUpperCase()}
                 </label>
               ))}
@@ -170,21 +192,22 @@ const UploadScreen = () => {
           <button
             onClick={handleUpload}
             disabled={uploadStatus.status === "uploading"}
-            className={`w-full py-2 px-4 rounded-md text-white font-semibold ${
-              uploadStatus.status === "uploading"
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-blue-500 hover:bg-blue-600"
-            }`}
+            className={`w-full py-2 px-4 rounded-md text-white font-semibold ${uploadStatus.status === "uploading" ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"}`}
           >
             {uploadStatus.status === "uploading" ? "Enviando..." : "Enviar Arquivo"}
           </button>
 
-          {downloadUrl && (
-            <a
-              href={downloadUrl}
-              className="mt-4 inline-block w-full text-center py-2 px-4 rounded-md bg-green-500 text-white font-semibold hover:bg-green-600"
-              download
+          {uploadStatus.status === "uploading" && (
+            <button
+              onClick={handleCancelUpload}
+              className="w-full mt-2 py-2 px-4 rounded-md bg-red-500 text-white font-semibold hover:bg-red-600"
             >
+              Cancelar Upload
+            </button>
+          )}
+
+          {downloadUrl && (
+            <a href={downloadUrl} className="mt-4 inline-block w-full text-center py-2 px-4 rounded-md bg-green-500 text-white font-semibold hover:bg-green-600" download>
               Baixar Arquivo Convertido
             </a>
           )}

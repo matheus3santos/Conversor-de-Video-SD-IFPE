@@ -1,4 +1,5 @@
 // services/messageQueue.js
+
 const amqp = require('amqplib');
 const winston = require('winston');
 const { v4: uuidv4 } = require('uuid');
@@ -27,6 +28,8 @@ class VideoQueue {
         this.connection = null;
         this.channel = null;
         this.QUEUE_NAME = 'video_conversion';
+        this.LOGS_QUEUE = 'logs_queue';
+        this.STATUS_QUEUE = 'status_queue';
         this.RETRY_EXCHANGE = 'video_retry_exchange';
         this.DEAD_LETTER_EXCHANGE = 'video_dlx';
         this.retryDelays = [5000, 10000, 30000]; // Tentativas em 5s, 10s, 30s
@@ -37,17 +40,14 @@ class VideoQueue {
             this.connection = await amqp.connect(process.env.RABBITMQ_URL || 'amqp://localhost');
             this.channel = await this.connection.createChannel();
 
+            // Configurar filas
+            await this.channel.assertQueue(this.QUEUE_NAME, { durable: true });
+            await this.channel.assertQueue(this.LOGS_QUEUE, { durable: true });
+            await this.channel.assertQueue(this.STATUS_QUEUE, { durable: true });
+
             // Configurar exchanges
             await this.channel.assertExchange(this.RETRY_EXCHANGE, 'direct');
             await this.channel.assertExchange(this.DEAD_LETTER_EXCHANGE, 'direct');
-
-            // Configurar fila principal
-            await this.channel.assertQueue(this.QUEUE_NAME, {
-                durable: true,
-                arguments: {
-                    'x-dead-letter-exchange': this.DEAD_LETTER_EXCHANGE
-                }
-            });
 
             // Configurar filas de retry
             for (let i = 0; i < this.retryDelays.length; i++) {
@@ -64,9 +64,7 @@ class VideoQueue {
             }
 
             // Configurar dead letter queue
-            await this.channel.assertQueue(`${this.QUEUE_NAME}_failed`, {
-                durable: true
-            });
+            await this.channel.assertQueue(`${this.QUEUE_NAME}_failed`, { durable: true });
             await this.channel.bindQueue(
                 `${this.QUEUE_NAME}_failed`,
                 this.DEAD_LETTER_EXCHANGE,
@@ -80,28 +78,37 @@ class VideoQueue {
         }
     }
 
-    async enqueueConversion(jobData) {
-        try {
-            const jobId = uuidv4();
-            await this.channel.sendToQueue(
-                this.QUEUE_NAME,
-                Buffer.from(JSON.stringify({
-                    ...jobData,
-                    jobId,
-                    attempts: 0,
-                    timestamp: new Date().toISOString()
-                })),
-                {
-                    persistent: true,
-                    messageId: jobId
-                }
-            );
-            logger.info(`Job de conversão enfileirado: ${jobId}`);
-            return jobId;
-        } catch (error) {
-            logger.error('Erro ao enfileirar conversão:', error);
-            throw error;
+    async enqueueConversion(videoData) {
+        if (!this.channel) {
+            logger.error('Canal do RabbitMQ não inicializado!');
+            throw new Error("Canal do RabbitMQ não inicializado!");
         }
+
+        logger.info('Enfileirando conversão com os seguintes dados:', videoData);
+
+        const jobId = uuidv4();
+        videoData.jobId = jobId;
+
+        // Publica o status inicial no RabbitMQ
+        await this.publishStatus(jobId, 'queued', { videoData });
+
+        // Envia o job para a fila de conversão
+        this.channel.sendToQueue(this.QUEUE_NAME, Buffer.from(JSON.stringify(videoData)), { persistent: true });
+
+        logger.info(`Job enfileirado: ${jobId}`);
+        return { jobId, status: 'queued' };
+    }
+
+    async publishStatus(jobId, status, details = {}) {
+        const statusMessage = {
+            jobId,
+            status,
+            timestamp: new Date().toISOString(),
+            ...details
+        };
+
+        this.channel.sendToQueue(this.STATUS_QUEUE, Buffer.from(JSON.stringify(statusMessage)), { persistent: true });
+        logger.info(`Status publicado: ${jobId} - ${status}`);
     }
 
     async processQueue(processCallback) {
@@ -110,17 +117,18 @@ class VideoQueue {
                 if (!msg) return;
 
                 const content = JSON.parse(msg.content.toString());
-                logger.info(`Processando job de conversão: ${content.jobId}`);
+                logger.info(`Processando job: ${content.jobId}`);
 
                 try {
+                    await this.publishStatus(content.jobId, 'processing', { content });
                     await processCallback(content);
+                    await this.publishStatus(content.jobId, 'completed', { content });
                     this.channel.ack(msg);
-                    logger.info(`Job de conversão concluído: ${content.jobId}`);
+                    logger.info(`Job concluído: ${content.jobId}`);
                 } catch (error) {
                     const attempts = (content.attempts || 0) + 1;
 
                     if (attempts <= this.retryDelays.length) {
-                        // Enviar para fila de retry apropriada
                         await this.channel.publish(
                             this.RETRY_EXCHANGE,
                             `retry-${attempts - 1}`,
@@ -128,7 +136,7 @@ class VideoQueue {
                         );
                         logger.warn(`Reagendando job ${content.jobId} para retry ${attempts}`);
                     } else {
-                        // Enviar para dead letter queue
+                        await this.publishStatus(content.jobId, 'failed', { error: error.message, content });
                         logger.error(`Job ${content.jobId} falhou após todas as tentativas`, {
                             error: error.message,
                             job: content
