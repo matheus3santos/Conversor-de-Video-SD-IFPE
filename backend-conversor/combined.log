@@ -1,0 +1,22 @@
+{"level":"info","message":"FFmpeg verificado com sucesso","service":"video-converter","timestamp":"2025-02-02T19:07:33.996Z"}
+{"level":"info","message":"Serviço de fila inicializado com sucesso","service":"video-converter","timestamp":"2025-02-02T19:07:34.154Z"}
+{"level":"info","message":"Container videos-si inicializado","service":"video-converter","timestamp":"2025-02-02T19:07:34.836Z"}
+{"level":"info","message":"Aplicação inicializada com sucesso","service":"video-converter","timestamp":"2025-02-02T19:07:34.836Z"}
+{"level":"info","message":"Arquivo enviado para Azure: 1738523297543-videoplayback.mp4","service":"video-converter","timestamp":"2025-02-02T19:08:54.231Z"}
+{"level":"info","message":"Job de conversão enfileirado: videoplayback.mp4","service":"video-converter","timestamp":"2025-02-02T19:08:54.232Z"}
+{"level":"info","message":"Worker de conversão iniciado","service":"video-converter","timestamp":"2025-02-02T19:15:45.217Z"}
+{"level":"info","message":"Arquivo enviado para Azure: 1738523765222-converted-1738513628013-videoplayback.mp4.mp3","service":"video-converter","timestamp":"2025-02-02T19:16:16.680Z"}
+{"level":"info","message":"Job de conversão enfileirado: converted-1738513628013-videoplayback.mp4.mp3","service":"video-converter","timestamp":"2025-02-02T19:16:16.681Z"}
+{"level":"info","message":"Processando job: 1738523765168-converted-1738513628013-videoplayback.mp4.mp3 (Tentativa 1)","service":"video-converter","timestamp":"2025-02-02T19:16:16.688Z"}
+{"level":"info","message":"Iniciando conversão: 1738523765168-converted-1738513628013-videoplayback.mp4.mp3","service":"video-converter","timestamp":"2025-02-02T19:16:16.689Z"}
+{"level":"info","message":"Executando comando FFmpeg: C:\\\\ffmpeg\\\\bin\\\\ffmpeg.exe -i \"temp\\\\1738523765168-converted-1738513628013-videoplayback.mp4.mp3\" -y \"temp\\converted-1738523765168-converted-1738513628013-videoplayback.mp4.mp3.wav\"","service":"video-converter","timestamp":"2025-02-02T19:16:16.689Z"}
+{"level":"info","message":"Comando FFmpeg executado com sucesso","service":"video-converter","timestamp":"2025-02-02T19:16:17.172Z"}
+{"level":"info","message":"Arquivo enviado para Azure: converted-1738523765168-converted-1738513628013-videoplayback.mp4.mp3.wav","service":"video-converter","timestamp":"2025-02-02T19:18:15.687Z"}
+{"level":"info","message":"Conversão finalizada com sucesso: 1738523765168-converted-1738513628013-videoplayback.mp4.mp3","service":"video-converter","timestamp":"2025-02-02T19:18:15.689Z"}
+{"level":"info","message":"Job concluído: 1738523765168-converted-1738513628013-videoplayback.mp4.mp3","service":"video-converter","timestamp":"2025-02-02T19:18:15.690Z"}
+{"level":"info","message":"Arquivo enviado para Azure: 1738524733045-videoplayback.mp4","service":"video-converter","timestamp":"2025-02-02T19:32:49.710Z"}
+{"level":"info","message":"Job de conversão enfileirado: videoplayback.mp4","service":"video-converter","timestamp":"2025-02-02T19:32:49.711Z"}
+{"level":"info","message":"FFmpeg verificado com sucesso","service":"video-converter","timestamp":"2025-02-02T19:34:38.200Z"}
+{"level":"info","message":"Serviço de fila inicializado com sucesso","service":"video-converter","timestamp":"2025-02-02T19:34:38.304Z"}
+{"level":"info","message":"Container videos-si inicializado","service":"video-converter","timestamp":"2025-02-02T19:34:38.986Z"}
+{"level":"info","message":"Aplicação inicializada com sucesso","service":"video-converter","timestamp":"2025-02-02T19:34:38.987Z"}
