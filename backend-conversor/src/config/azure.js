@@ -2,8 +2,6 @@
 const {
     BlobServiceClient,
     StorageSharedKeyCredential,
-    generateBlobSASQueryParameters,
-    BlobSASPermissions
 } = require('@azure/storage-blob');
 const logger = require('./logger');
 

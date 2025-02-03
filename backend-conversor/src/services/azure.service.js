@@ -43,7 +43,7 @@ class AzureService {
             const expiresOn = new Date(startsOn);
             expiresOn.setHours(startsOn.getHours() + 24);
 
-            const permissions = BlobSASPermissions.parse("r");
+            const permissions = BlobSASPermissions.parse("racwd");
 
             const sasOptions = {
                 containerName,

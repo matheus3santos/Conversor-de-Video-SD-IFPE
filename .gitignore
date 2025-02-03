@@ -1,1 +1,7 @@
 node_modules
+logs
+.env
+temp
+temp
+error.log
+combined.log

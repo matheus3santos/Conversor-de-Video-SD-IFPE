@@ -36,7 +36,7 @@ router.post('/upload', uploadMiddleware, async (req, res, next) => {
       outputFormat,
       fileName: file.filename,
       originalName: file.originalname,
-      blobName
+      blobName: `${blobName}.${outputFormat}`
     };
 
     // Enfileirar job de conversão
@@ -45,7 +45,9 @@ router.post('/upload', uploadMiddleware, async (req, res, next) => {
     res.json({
       success: true,
       message: 'Arquivo enviado para conversão',
-      jobId: jobData.fileName
+      jobId: jobData.fileName,
+      blobName: jobData.blobName, // Adiciona blobName para buscar depois
+
     });
 
   } catch (error) {
@@ -54,4 +56,18 @@ router.post('/upload', uploadMiddleware, async (req, res, next) => {
   }
 });
 
+// Endpoint para download do arquivo convertido
+router.get('/download/:blobName', async (req, res, next) => {
+  try {
+    const { blobName } = req.params;
+
+    // Gerar URL de download com SAS token
+    const downloadUrl = await azureService.generateSasUrl(blobName);
+
+    res.json({ downloadUrl });
+  } catch (error) {
+    logger.error('Erro ao gerar link de download:', error);
+    next(error);
+  }
+});
 module.exports = router;

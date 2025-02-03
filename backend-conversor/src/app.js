@@ -12,7 +12,11 @@ const { checkFFmpeg } = require('./utils/ffmpeg');
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: "*", // Permitir todas as origens (use um domínio específico para produção)
+  methods: ["GET", "POST"],
+  allowedHeaders: ["Content-Type"]
+}));
 app.use(express.json());
 app.use(morgan('dev'));
 
@@ -21,7 +25,7 @@ app.use('/api', uploadRoutes);
 
 // Rota de health check
 app.get('/health', (req, res) => {
-  res.json({ 
+  res.json({
     status: 'online',
     message: 'API de conversão de vídeo funcionando'
   });
@@ -49,7 +53,7 @@ async function initializeApp() {
 // Graceful shutdown
 process.on('SIGTERM', async () => {
   logger.info('SIGTERM recebido. Iniciando shutdown graceful...');
-  
+
   try {
     await queueService.close();
     logger.info('Conexões fechadas com sucesso');
