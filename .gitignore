@@ -1,5 +1,14 @@
 node_modules
+<<<<<<< HEAD
 .env
 env.js
 .temp
 temp
+=======
+logs
+.env
+temp
+temp
+error.log
+combined.log
+>>>>>>> Branch-Teste-2

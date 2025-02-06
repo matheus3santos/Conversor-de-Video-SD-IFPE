@@ -1,0 +1,20 @@
+2025-01-30 13:25:37 error: Unhandled Rejection: Cannot read properties of undefined (reading 'error')
+TypeError: Cannot read properties of undefined (reading 'error')
+    at startServer (A:\MATHEUS\Documents\GitHub\Conversor-de-Video-SD-IFPE\backend-conversor\index.js:59:12)
+    at Object.<anonymous> (A:\MATHEUS\Documents\GitHub\Conversor-de-Video-SD-IFPE\backend-conversor\index.js:64:1)
+    at Module._compile (node:internal/modules/cjs/loader:1233:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1287:10)
+    at Module.load (node:internal/modules/cjs/loader:1091:32)
+    at Module._load (node:internal/modules/cjs/loader:938:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:83:12)
+    at node:internal/main/run_main_module:23:47
+2025-01-30 16:11:34 error: [VideoQueue] Tentativa 1 falhou: Socket closed abruptly during opening handshake
+2025-01-30 16:11:44 error: [VideoQueue] Tentativa 2 falhou: Socket closed abruptly during opening handshake
+2025-01-30 16:11:54 error: [VideoQueue] Tentativa 3 falhou: Socket closed abruptly during opening handshake
+2025-02-02 12:38:45 error: [VideoQueue] Tentativa 1 falhou: 
+2025-02-02 12:38:50 error: [VideoQueue] Tentativa 2 falhou: 
+2025-02-02 12:38:55 error: [VideoQueue] Tentativa 3 falhou: 
+2025-02-02 12:39:00 error: [VideoQueue] Tentativa 4 falhou: 
+2025-02-02 12:39:05 error: [VideoQueue] Tentativa 5 falhou: 
+2025-02-02 12:39:22 error: [VideoQueue] Tentativa 1 falhou: Socket closed abruptly during opening handshake
+2025-02-02 12:39:27 error: [VideoQueue] Tentativa 2 falhou: Socket closed abruptly during opening handshake

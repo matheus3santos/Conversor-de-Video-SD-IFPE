@@ -1,0 +1,157 @@
+2025-01-30 13:25:37 error: Unhandled Rejection: Cannot read properties of undefined (reading 'error')
+TypeError: Cannot read properties of undefined (reading 'error')
+    at startServer (A:\MATHEUS\Documents\GitHub\Conversor-de-Video-SD-IFPE\backend-conversor\index.js:59:12)
+    at Object.<anonymous> (A:\MATHEUS\Documents\GitHub\Conversor-de-Video-SD-IFPE\backend-conversor\index.js:64:1)
+    at Module._compile (node:internal/modules/cjs/loader:1233:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1287:10)
+    at Module.load (node:internal/modules/cjs/loader:1091:32)
+    at Module._load (node:internal/modules/cjs/loader:938:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:83:12)
+    at node:internal/main/run_main_module:23:47
+2025-01-30 13:34:30 info: [VideoQueue] Tentando conectar ao RabbitMQ...
+2025-01-30 13:34:31 info: [VideoQueue] Conectado com sucesso ao RabbitMQ
+2025-01-30 13:34:31 info: [VideoQueue] Filas e exchanges configurados com sucesso
+2025-01-30 13:34:31 info: [App] Conexão com RabbitMQ estabelecida
+2025-01-30 13:34:31 info: [App] Servidor rodando na porta 4000
+2025-01-30 13:34:31 info: [App] Ambiente: development
+2025-01-30 13:39:03 info: [App] Iniciando desligamento gracioso...
+2025-01-30 13:39:03 warn: [VideoQueue] Conexão RabbitMQ fechada
+2025-01-30 13:39:06 info: [VideoQueue] Tentando conectar ao RabbitMQ...
+2025-01-30 13:39:06 info: [VideoQueue] Conectado com sucesso ao RabbitMQ
+2025-01-30 13:39:06 info: [VideoQueue] Filas e exchanges configurados com sucesso
+2025-01-30 13:39:06 info: [App] Conexão com RabbitMQ estabelecida
+2025-01-30 13:39:06 info: [App] Servidor rodando na porta 4000
+2025-01-30 13:39:06 info: [App] Ambiente: development
+2025-01-30 14:00:35 info: [App] Iniciando desligamento gracioso...
+2025-01-30 14:00:35 warn: [VideoQueue] Conexão RabbitMQ fechada
+2025-01-30 14:00:37 info: [VideoQueue] Tentando conectar ao RabbitMQ...
+2025-01-30 14:00:37 info: [VideoQueue] Conectado com sucesso ao RabbitMQ
+2025-01-30 14:00:37 info: [VideoQueue] Filas e exchanges configurados com sucesso
+2025-01-30 14:00:37 info: [App] Conexão com RabbitMQ estabelecida
+2025-01-30 14:00:37 info: [App] Servidor rodando na porta 4000
+2025-01-30 14:00:37 info: [App] Ambiente: development
+2025-01-30 15:00:48 info: [App] Iniciando desligamento gracioso...
+2025-01-30 15:00:48 warn: [VideoQueue] Conexão RabbitMQ fechada
+2025-01-30 15:00:52 info: [VideoQueue] Tentando conectar ao RabbitMQ...
+2025-01-30 15:00:52 info: [VideoQueue] Conectado com sucesso ao RabbitMQ
+2025-01-30 15:00:52 info: [VideoQueue] Filas e exchanges configurados com sucesso
+2025-01-30 15:00:52 info: [App] Conexão com RabbitMQ estabelecida
+2025-01-30 15:00:52 info: [App] Servidor rodando na porta 4000
+2025-01-30 15:00:52 info: [App] Ambiente: development
+2025-01-30 15:02:32 info: [VideoQueue] Vídeo enviado para processamento: undefined
+2025-01-30 15:04:43 info: [VideoQueue] Vídeo enviado para processamento: undefined
+2025-01-30 15:16:35 info: [VideoQueue] Vídeo enviado para processamento: undefined
+2025-01-30 15:23:56 info: [App] Iniciando desligamento gracioso...
+2025-01-30 15:23:56 warn: [VideoQueue] Conexão RabbitMQ fechada
+2025-01-30 15:23:58 info: [VideoQueue] Tentando conectar ao RabbitMQ...
+2025-01-30 15:23:58 info: [VideoQueue] Conectado com sucesso ao RabbitMQ
+2025-01-30 15:23:58 info: [VideoQueue] Filas e exchanges configurados com sucesso
+2025-01-30 15:23:58 info: [App] Conexão com RabbitMQ estabelecida
+2025-01-30 15:23:58 info: [App] Servidor rodando na porta 4000
+2025-01-30 15:23:58 info: [App] Ambiente: development
+2025-01-30 15:24:53 info: [VideoQueue] Vídeo enviado para processamento: undefined
+2025-01-30 15:25:49 info: [App] Iniciando desligamento gracioso...
+2025-01-30 15:25:49 warn: [VideoQueue] Conexão RabbitMQ fechada
+2025-01-30 15:32:54 info: [VideoQueue] Tentando conectar ao RabbitMQ...
+2025-01-30 15:32:54 info: [VideoQueue] Conectado com sucesso ao RabbitMQ
+2025-01-30 15:32:54 info: [VideoQueue] Filas e exchanges configurados com sucesso
+2025-01-30 15:32:54 info: [App] Conexão com RabbitMQ estabelecida
+2025-01-30 15:32:54 info: [App] Servidor rodando na porta 4000
+2025-01-30 15:32:54 info: [App] Ambiente: development
+2025-01-30 15:33:44 info: [VideoQueue] Vídeo enviado para processamento: undefined
+2025-01-30 15:39:12 info: [App] Iniciando desligamento gracioso...
+2025-01-30 15:39:12 warn: [VideoQueue] Conexão RabbitMQ fechada
+2025-01-30 15:39:18 info: [VideoQueue] Tentando conectar ao RabbitMQ...
+2025-01-30 15:39:18 info: [VideoQueue] Conectado com sucesso ao RabbitMQ
+2025-01-30 15:39:18 info: [VideoQueue] Filas e exchanges configurados com sucesso
+2025-01-30 15:39:18 info: [App] Conexão com RabbitMQ estabelecida
+2025-01-30 15:39:18 info: [App] Servidor rodando na porta 4000
+2025-01-30 15:39:18 info: [App] Ambiente: development
+2025-01-30 15:40:08 info: [VideoQueue] Vídeo enviado para processamento: undefined
+2025-01-30 15:42:53 info: [App] Iniciando desligamento gracioso...
+2025-01-30 15:42:53 warn: [VideoQueue] Conexão RabbitMQ fechada
+2025-01-30 15:42:56 info: [VideoQueue] Tentando conectar ao RabbitMQ...
+2025-01-30 15:42:56 info: [VideoQueue] Conectado com sucesso ao RabbitMQ
+2025-01-30 15:42:56 info: [VideoQueue] Filas e exchanges configurados com sucesso
+2025-01-30 15:42:56 info: [App] Conexão com RabbitMQ estabelecida
+2025-01-30 15:42:56 info: [App] Servidor rodando na porta 4000
+2025-01-30 15:42:56 info: [App] Ambiente: development
+2025-01-30 15:43:48 info: [VideoQueue] Vídeo enviado para processamento: undefined
+2025-01-30 15:56:35 info: [App] Iniciando desligamento gracioso...
+2025-01-30 15:56:35 warn: [VideoQueue] Conexão RabbitMQ fechada
+2025-01-30 15:56:38 info: [VideoQueue] Tentando conectar ao RabbitMQ...
+2025-01-30 15:56:38 info: [VideoQueue] Conectado com sucesso ao RabbitMQ
+2025-01-30 15:56:38 info: [VideoQueue] Filas e exchanges configurados com sucesso
+2025-01-30 15:56:38 info: [App] Conexão com RabbitMQ estabelecida
+2025-01-30 15:56:38 info: [App] Servidor rodando na porta 4000
+2025-01-30 15:56:38 info: [App] Ambiente: development
+2025-01-30 15:57:26 info: [VideoQueue] Vídeo enviado para processamento: gtrjjb
+2025-01-30 16:11:24 info: [App] Iniciando desligamento gracioso...
+2025-01-30 16:11:24 warn: [VideoQueue] Conexão RabbitMQ fechada
+2025-01-30 16:11:29 info: [VideoQueue] Tentando conectar ao RabbitMQ...
+2025-01-30 16:11:34 error: [VideoQueue] Tentativa 1 falhou: Socket closed abruptly during opening handshake
+2025-01-30 16:11:39 info: [VideoQueue] Tentando conectar ao RabbitMQ...
+2025-01-30 16:11:44 error: [VideoQueue] Tentativa 2 falhou: Socket closed abruptly during opening handshake
+2025-01-30 16:11:49 info: [VideoQueue] Tentando conectar ao RabbitMQ...
+2025-01-30 16:11:54 error: [VideoQueue] Tentativa 3 falhou: Socket closed abruptly during opening handshake
+2025-01-30 16:11:55 info: [App] Iniciando desligamento gracioso...
+2025-01-30 16:16:42 info: [VideoQueue] Tentando conectar ao RabbitMQ...
+2025-01-30 16:16:42 info: [VideoQueue] Conectado com sucesso ao RabbitMQ
+2025-01-30 16:16:42 info: [VideoQueue] Filas e exchanges configurados com sucesso
+2025-01-30 16:16:42 info: [App] Conexão com RabbitMQ estabelecida
+2025-01-30 16:16:42 info: [App] Servidor rodando na porta 4000
+2025-01-30 16:16:42 info: [App] Ambiente: development
+2025-01-30 16:17:27 info: [VideoQueue] Vídeo enviado para processamento: 21vfxs
+2025-01-30 16:19:27 info: [VideoQueue] Vídeo enviado para processamento: 4pjfi5
+2025-01-30 17:35:19 info: [App] Iniciando desligamento gracioso...
+2025-01-30 17:35:19 warn: [VideoQueue] Conexão RabbitMQ fechada
+2025-02-02 12:38:45 info: [VideoQueue] Tentando conectar ao RabbitMQ...
+2025-02-02 12:38:45 error: [VideoQueue] Tentativa 1 falhou: 
+2025-02-02 12:38:50 info: [VideoQueue] Tentando conectar ao RabbitMQ...
+2025-02-02 12:38:50 error: [VideoQueue] Tentativa 2 falhou: 
+2025-02-02 12:38:55 info: [VideoQueue] Tentando conectar ao RabbitMQ...
+2025-02-02 12:38:55 error: [VideoQueue] Tentativa 3 falhou: 
+2025-02-02 12:39:00 info: [VideoQueue] Tentando conectar ao RabbitMQ...
+2025-02-02 12:39:00 error: [VideoQueue] Tentativa 4 falhou: 
+2025-02-02 12:39:05 info: [VideoQueue] Tentando conectar ao RabbitMQ...
+2025-02-02 12:39:05 error: [VideoQueue] Tentativa 5 falhou: 
+2025-02-02 12:39:22 info: [VideoQueue] Tentando conectar ao RabbitMQ...
+2025-02-02 12:39:22 error: [VideoQueue] Tentativa 1 falhou: Socket closed abruptly during opening handshake
+2025-02-02 12:39:27 info: [VideoQueue] Tentando conectar ao RabbitMQ...
+2025-02-02 12:39:27 error: [VideoQueue] Tentativa 2 falhou: Socket closed abruptly during opening handshake
+2025-02-02 12:39:32 info: [VideoQueue] Tentando conectar ao RabbitMQ...
+2025-02-02 12:39:33 info: [VideoQueue] Conectado com sucesso ao RabbitMQ
+2025-02-02 12:39:33 info: [VideoQueue] Filas e exchanges configurados com sucesso
+2025-02-02 12:39:33 info: [App] Conexão com RabbitMQ estabelecida
+2025-02-02 12:39:33 info: [App] Servidor rodando na porta 4000
+2025-02-02 12:39:33 info: [App] Ambiente: development
+2025-02-02 12:44:52 info: [VideoQueue] Vídeo enviado para processamento: u88hvvh
+2025-02-02 12:58:33 info: [App] Iniciando desligamento gracioso...
+2025-02-02 12:58:33 warn: [VideoQueue] Conexão RabbitMQ fechada
+2025-02-02 12:58:37 info: [VideoQueue] Tentando conectar ao RabbitMQ...
+2025-02-02 12:58:37 info: [VideoQueue] Conectado com sucesso ao RabbitMQ
+2025-02-02 12:58:37 info: [VideoQueue] Filas e exchanges configurados com sucesso
+2025-02-02 12:58:37 info: [App] Conexão com RabbitMQ estabelecida
+2025-02-02 12:58:37 info: [App] Servidor rodando na porta 4000
+2025-02-02 12:58:37 info: [App] Ambiente: development
+2025-02-02 12:59:23 info: [VideoQueue] Vídeo enviado para processamento: gn6ll
+2025-02-02 13:02:12 info: [VideoQueue] Vídeo enviado para processamento: foov7
+2025-02-02 13:02:55 info: [App] Iniciando desligamento gracioso...
+2025-02-02 13:02:55 warn: [VideoQueue] Conexão RabbitMQ fechada
+2025-02-02 13:03:00 info: [VideoQueue] Tentando conectar ao RabbitMQ...
+2025-02-02 13:03:01 info: [VideoQueue] Conectado com sucesso ao RabbitMQ
+2025-02-02 13:03:01 info: [VideoQueue] Filas e exchanges configurados com sucesso
+2025-02-02 13:03:01 info: [App] Conexão com RabbitMQ estabelecida
+2025-02-02 13:03:01 info: [App] Servidor rodando na porta 4000
+2025-02-02 13:03:01 info: [App] Ambiente: development
+2025-02-02 13:05:07 info: [VideoQueue] Vídeo enviado para processamento: bjidwp
+2025-02-02 13:17:40 info: [App] Iniciando desligamento gracioso...
+2025-02-02 13:17:40 warn: [VideoQueue] Conexão RabbitMQ fechada
+2025-02-02 13:17:43 info: [VideoQueue] Tentando conectar ao RabbitMQ...
+2025-02-02 13:17:43 info: [VideoQueue] Conectado com sucesso ao RabbitMQ
+2025-02-02 13:17:43 info: [VideoQueue] Filas e exchanges configurados com sucesso
+2025-02-02 13:17:43 info: [App] Conexão com RabbitMQ estabelecida
+2025-02-02 13:17:43 info: [App] Servidor rodando na porta 4000
+2025-02-02 13:17:43 info: [App] Ambiente: development
+2025-02-02 13:22:27 info: [App] Iniciando desligamento gracioso...
+2025-02-02 13:22:27 warn: [VideoQueue] Conexão RabbitMQ fechada
