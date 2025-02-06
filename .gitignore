@@ -3,8 +3,3 @@ node_modules
 env.js
 .temp
 temp
-*temp
-logs
-.logs
-backend-conversor/logs/combined.log
-/backend-conversor/logs
