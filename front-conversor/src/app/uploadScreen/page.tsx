@@ -1,198 +1,110 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import Header from "../../components/headerBar";
-<<<<<<< HEAD
-import { AlertCircle, CheckCircle2, Upload, FileIcon } from "lucide-react";
-=======
-import { AlertCircle, Upload, Loader2, CheckCircle2, Download } from "lucide-react";
->>>>>>> Branch-Teste-2
+import { Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-
-interface UploadStatus {
-  status: "idle" | "uploading" | "converting" | "success" | "error";
-  message: string;
-}
 
 const UploadScreen = () => {
   const [file, setFile] = useState<File | null>(null);
   const [selectedFormat, setSelectedFormat] = useState<string>("");
-  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
-  const [blobName, setBlobName] = useState<string | null>(null);
-  const [uploadStatus, setUploadStatus] = useState<UploadStatus>({
-    status: "idle",
-    message: "",
-  });
-  const [abortController, setAbortController] = useState<AbortController | null>(null);
+  const [email, setEmail] = useState<string>("");
+  const [uploadStatus, setUploadStatus] = useState<"idle" | "uploading" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
 
-<<<<<<< HEAD
-  const conversionOptions = ["mp3", "mp4", "avi", "wav", "mkv"];
-  const validExtensions = ["mp4", "avi", "mkv", "wav", "mp3"];
-  const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
-=======
   const conversionOptions = ["mp3", "mp4", "avi", "wav"];
->>>>>>> Branch-Teste-2
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
-      if (selectedFile.size > MAX_FILE_SIZE) {
-        setUploadStatus({
-          status: "error",
-          message: "O arquivo é muito grande. O limite é 100MB.",
-        });
+      // Validação do tamanho do arquivo (exemplo: 100MB)
+      if (selectedFile.size > 100 * 1024 * 1024) {
+        setErrorMessage("Arquivo muito grande. Limite máximo de 100MB.");
         return;
       }
 
       const extension = selectedFile.name.split(".").pop()?.toLowerCase() || "";
-      if (!validExtensions.includes(extension)) {
-        setUploadStatus({
-          status: "error",
-          message: "Formato de arquivo não suportado.",
-        });
-        return;
-      }
-
       setFile(selectedFile);
-      setFileExtension(extension);
-      setDownloadUrl(null);
-      setUploadStatus({ status: "idle", message: "" });
+      setSelectedFormat(extension);
+      setErrorMessage("");
+    }
+  };
+
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+    if (errorMessage && validateEmail(e.target.value)) {
+      setErrorMessage("");
     }
   };
 
   const handleUpload = async () => {
-    if (!file || !selectedFormat) {
-      setUploadStatus({
-        status: "error",
-        message: "Selecione um arquivo e escolha o formato de conversão.",
-      });
+    // Validações melhoradas
+    if (!file) {
+      setErrorMessage("Por favor, selecione um arquivo.");
       return;
     }
+
+    if (!selectedFormat) {
+      setErrorMessage("Por favor, selecione um formato de conversão.");
+      return;
+    }
+
+    if (!email) {
+      setErrorMessage("Por favor, informe seu email.");
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      setErrorMessage("Por favor, informe um email válido.");
+      return;
+    }
+
+    setUploadStatus("uploading");
+    setErrorMessage("");
+    setUploadProgress(0);
 
     const formData = new FormData();
     formData.append("file", file);
     formData.append("outputFormat", selectedFormat);
-
-    console.log("Enviando arquivo:", file);
-    console.log("Formato de entrada:", fileExtension);
-    console.log("Formato de saída:", selectedFormat);
+    formData.append("email", email.trim().toLowerCase());
 
     try {
-      setUploadStatus({
-        status: "uploading",
-        message: "Enviando arquivo...",
-      });
-
       const response = await axios.post(`${API_BASE_URL}/api/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
+        onUploadProgress: (progressEvent) => {
+          const progress = progressEvent.total
+            ? Math.round((progressEvent.loaded * 100) / progressEvent.total)
+            : 0;
+          setUploadProgress(progress);
+        },
       });
 
-      console.log("Resposta do servidor:", response.data);
-
-      setUploadStatus({
-        status: "converting",
-<<<<<<< HEAD
-        message: "Arquivo enviado! Convertendo...",
-      });
-
-      // const conversionId = response.data.conversionId;
-      // const checkStatusInterval = setInterval(async () => {
-      //   const statusResponse = await axios.get(`${API_BASE_URL}/api/status/${conversionId}`);
-      //   if (statusResponse.data.status === "completed") {
-      //     clearInterval(checkStatusInterval);
-      //     setUploadStatus({
-      //       status: "success",
-      //       message: "Arquivo convertido com sucesso!",
-      //     });
-      //     setDownloadUrl(statusResponse.data.downloadUrl);
-      //   } else if (statusResponse.data.status === "failed") {
-      //     clearInterval(checkStatusInterval);
-      //     setUploadStatus({
-      //       status: "error",
-      //       message: "Falha na conversão do arquivo.",
-      //     });
-      //   }
-      // }, 4000);
+      if (response.data.success) {
+        setUploadStatus("success");
+        setErrorMessage("");
+        // Limpar formulário após sucesso
+        setFile(null);
+        setEmail("");
+        setSelectedFormat("");
+        // Reset file input
+        const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+        if (fileInput) fileInput.value = "";
+      }
     } catch (error: any) {
-      console.error("Erro ao enviar arquivo:", error);
-      let errorMessage = "Falha no envio do arquivo. Tente novamente.";
-      if (error.response) {
-        if (error.response.status === 413) {
-          errorMessage = "O arquivo é muito grande. O limite é 100MB.";
-        } else if (error.response.status === 400) {
-          errorMessage = "Formato de arquivo não suportado.";
-        }
-      }
-      setUploadStatus({
-        status: "error",
-        message: errorMessage,
-      });
+      setUploadStatus("error");
+      setErrorMessage(
+        error.response?.data?.error ||
+        "Erro ao enviar o arquivo. Tente novamente."
+      );
     }
   };
-
-  const handleCancelUpload = () => {
-    if (abortController) {
-      abortController.abort();
-    }
-  };
-
-  useEffect(() => {
-    return () => {
-      if (abortController) {
-        abortController.abort();
-      }
-    };
-  }, [abortController]);
-=======
-        message: "Convertendo arquivo...",
-      });
-
-      setBlobName(response.data.blobName);
-      checkForConvertedFile(response.data.blobName);
-      
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.error || "Falha no envio do arquivo. Tente novamente.";
-      setUploadStatus({ status: "error", message: errorMessage });
-    }
-  };
-
-  const checkForConvertedFile = async (blobName: string) => {
-    let attempts = 0;
-    const maxAttempts = 12; // Máximo de 60 segundos (12 tentativas de 5s)
-    
-    while (attempts < maxAttempts) {
-      try {
-        const response = await axios.get(`${API_BASE_URL}/api/download/${blobName}`);
-        
-        if (response.data.downloadUrl) {
-          setDownloadUrl(response.data.downloadUrl);
-          setUploadStatus({
-            status: "success",
-            message: "Arquivo pronto para download!",
-          });
-          return;
-        }
-      } catch (error) {
-        console.log("Arquivo ainda não disponível, tentando novamente...");
-      }
-
-      await new Promise((resolve) => setTimeout(resolve, 5000)); // Espera 5s antes de tentar novamente
-      attempts++;
-    }
-
-    setUploadStatus({
-      status: "error",
-      message: "Ocorreu um erro ou o tempo de conversão expirou.",
-    });
-  };
-
-  const handleDownload = () => {
-    if (downloadUrl) {
-      window.open(downloadUrl, '_blank');
-    }
-  };
->>>>>>> Branch-Teste-2
 
   return (
     <div>
@@ -203,105 +115,97 @@ const UploadScreen = () => {
             Upload e Conversão de Arquivo
           </h1>
 
-          {uploadStatus.status !== "idle" && (
-<<<<<<< HEAD
-            <div className={`mb-4 p-3 rounded-md border flex items-center gap-2`}>
-              {uploadStatus.status === "error" && <AlertCircle className="w-5 h-5 text-red-600" />}
-              {uploadStatus.status === "success" && <CheckCircle2 className="w-5 h-5 text-green-600" />}
-              {uploadStatus.status === "uploading" && <Upload className="w-5 h-5 animate-pulse text-blue-600" />}
-=======
-            <div className={`mb-4 p-3 rounded-md border flex items-center gap-2 ${
-              uploadStatus.status === "error" ? "bg-red-100 text-red-800 border-red-300" : "bg-blue-100 text-blue-800 border-blue-300"
-            }`}>
-              {uploadStatus.status === "error" ? <AlertCircle className="w-5 h-5" /> : <Upload className="w-5 h-5 animate-pulse" />}
->>>>>>> Branch-Teste-2
-              <span>{uploadStatus.message}</span>
+          {/* Status Messages */}
+          {uploadStatus === "error" && (
+            <div className="mb-4 p-3 rounded-md border bg-red-100 text-red-800 border-red-300 flex items-center">
+              <AlertCircle className="w-5 h-5 mr-2" />
+              {errorMessage}
             </div>
           )}
+
+          {uploadStatus === "success" && (
+            <div className="mb-4 p-3 rounded-md border bg-green-100 text-green-800 border-green-300 flex items-center">
+              <CheckCircle2 className="w-5 h-5 mr-2" />
+              Arquivo enviado com sucesso! Você receberá um email quando a conversão estiver pronta.
+            </div>
+          )}
+
+          {/* Form Fields */}
+          <input
+            type="email"
+            value={email}
+            onChange={handleEmailChange}
+            placeholder="Digite seu e-mail"
+            className="mb-4 w-full px-4 py-2 text-sm text-gray-500 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            required
+          />
 
           <input
             type="file"
             onChange={handleFileChange}
             className="mb-4 w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200"
+            required
           />
 
-<<<<<<< HEAD
-          {file && (
-            <div className="mb-4 flex items-center gap-2">
-              <FileIcon className="w-5 h-5" />
-              <span>{file.name}</span>
+          {/* Upload Progress */}
+          {uploadStatus === "uploading" && (
+            <div className="mb-4">
+              <div className="w-full bg-gray-200 rounded-full h-2.5">
+                <div
+                  className="bg-blue-500 h-2.5 rounded-full transition-all duration-300"
+                  style={{ width: `${uploadProgress}%` }}
+                ></div>
+              </div>
+              <p className="text-sm text-gray-500 mt-1 text-center">
+                {uploadProgress}% enviado
+              </p>
             </div>
           )}
 
-=======
->>>>>>> Branch-Teste-2
+          {/* Conversion Format Selection */}
           <div className="mb-4">
-            <p className="text-sm font-semibold mb-2">Escolha o formato de conversão:</p>
+            <p className="text-sm font-semibold mb-2">
+              Escolha o formato de conversão:
+            </p>
             <div className="grid grid-cols-2 gap-2">
               {conversionOptions.map((format) => (
-                <label key={format} className="flex items-center p-2 border rounded-md hover:bg-gray-50 cursor-pointer">
-<<<<<<< HEAD
-                  <input type="radio" name="conversionFormat" value={format} onChange={() => setSelectedFormat(format)} className="mr-2" />
-=======
+                <label
+                  key={format}
+                  className={`flex items-center p-2 border rounded-md hover:bg-gray-50 cursor-pointer ${selectedFormat === format ? "bg-blue-50 border-blue-500" : ""
+                    }`}
+                >
                   <input
                     type="radio"
                     name="conversionFormat"
                     value={format}
                     onChange={() => setSelectedFormat(format)}
                     className="mr-2"
+                    checked={selectedFormat === format}
                   />
->>>>>>> Branch-Teste-2
                   {format.toUpperCase()}
                 </label>
               ))}
             </div>
           </div>
 
+          {/* Upload Button */}
           <button
             onClick={handleUpload}
-<<<<<<< HEAD
-            disabled={uploadStatus.status === "uploading"}
-            className={`w-full py-2 px-4 rounded-md text-white font-semibold ${uploadStatus.status === "uploading" ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"}`}
-=======
-            disabled={uploadStatus.status === "uploading" || uploadStatus.status === "converting"}
-            className={`w-full py-2 px-4 rounded-md text-white font-semibold ${
-              uploadStatus.status === "uploading" || uploadStatus.status === "converting" ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"
-            }`}
->>>>>>> Branch-Teste-2
+            disabled={uploadStatus === "uploading"}
+            className={`w-full py-2 px-4 rounded-md text-white font-semibold flex items-center justify-center ${uploadStatus === "uploading"
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-500 hover:bg-blue-600"
+              }`}
           >
-            {uploadStatus.status === "uploading" ? "Enviando..." : "Enviar Arquivo"}
+            {uploadStatus === "uploading" ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                Enviando...
+              </>
+            ) : (
+              "Enviar Arquivo"
+            )}
           </button>
-
-<<<<<<< HEAD
-          {uploadStatus.status === "uploading" && (
-            <button
-              onClick={handleCancelUpload}
-              className="w-full mt-2 py-2 px-4 rounded-md bg-red-500 text-white font-semibold hover:bg-red-600"
-            >
-              Cancelar Upload
-            </button>
-          )}
-
-          {downloadUrl && (
-            <a href={downloadUrl} className="mt-4 inline-block w-full text-center py-2 px-4 rounded-md bg-green-500 text-white font-semibold hover:bg-green-600" download>
-=======
-          {uploadStatus.status === "converting" && (
-            <div className="flex justify-center items-center mt-4">
-              <Loader2 className="w-6 h-6 animate-spin text-gray-500" />
-              <span className="ml-2 text-gray-600">Convertendo arquivo...</span>
-            </div>
-          )}
-
-          {uploadStatus.status === "success" && downloadUrl && (
-            <button
-              onClick={handleDownload}
-              className="mt-4 inline-block w-full text-center py-2 px-4 rounded-md bg-green-500 text-white font-semibold hover:bg-green-600 flex items-center justify-center"
-            >
-              <Download className="w-5 h-5 mr-2" />
->>>>>>> Branch-Teste-2
-              Baixar Arquivo Convertido
-            </button>
-          )}
         </div>
       </div>
     </div>
