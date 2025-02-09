@@ -2,14 +2,18 @@
 const { exec } = require('child_process');
 const logger = require('../config/logger');
 
-const FFMPEG_PATH = process.env.FFMPEG_PATH || 'ffmpeg';
+// const FFMPEG_PATH = process.env.FFMPEG_PATH || 'ffmpeg'; Para rodar localmente descomente essa linha e comente a linha de baixo
+
+const FFMPEG_PATH = 'ffmpeg';  // O binário já está disponível no Docker
+
 
 function executeFFmpeg(inputPath, outputPath) {
     return new Promise((resolve, reject) => {
-        const inputPathFixed = inputPath.replace(/\\/g, '\\\\');
-        const outputPathFixed = outputPath.replace(/\//g, '\\');
+        // Garantia que o caminho do arquivo está correto caso seja Windows
+        // const inputPathFixed = inputPath.replace(/\\/g, '\\\\');
+        // const outputPathFixed = outputPath.replace(/\//g, '\\');
 
-        const ffmpegCommand = `${FFMPEG_PATH} -i "${inputPathFixed}" -y "${outputPathFixed}"`;
+        const ffmpegCommand = `${FFMPEG_PATH} -i "${inputPath}" -y "${outputPath}"`;
         logger.info(`Executando comando FFmpeg: ${ffmpegCommand}`);
 
         exec(ffmpegCommand, (error, stdout, stderr) => {

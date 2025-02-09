@@ -1,0 +1,49 @@
+version: '3.8'
+services:
+  app1:
+    build: .
+    container_name: app1
+    command: npm start
+    depends_on:
+      - rabbitmq
+    ports:
+      - "4000:4000" # Expondo a porta 4000
+
+  app2:
+    build: .
+    container_name: app2
+    command: npm start
+    depends_on:
+      - rabbitmq
+    ports:
+      - "4000:4001"  # Porta externa 4000 mapeada para porta interna 4001 do app2 (porta interna diferente)
+
+  worker1:
+    build: .
+    container_name: worker1
+    command: node worker.js
+    depends_on:
+      - rabbitmq
+
+  worker2:
+    build: .
+    container_name: worker2
+    command: node worker.js
+    depends_on:
+      - rabbitmq
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app1
+      - app2
+
+  rabbitmq:
+    image: rabbitmq:management
+    ports:
+      - "5672:5672" # Porta para comunicação AMQP
+      - "15672:15672" # Interface de gerenciamento do RabbitMQ

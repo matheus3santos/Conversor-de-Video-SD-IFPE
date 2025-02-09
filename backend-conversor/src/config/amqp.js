@@ -1,7 +1,7 @@
 // config/amqp.js
 const amqp = require('amqplib');
 
-const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://localhost';
+const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://rabbitmq';
 const QUEUE_NAME = 'video-conversion';
 const DLQ_NAME = 'video-conversion-dlq'; // Dead Letter Queue
 
