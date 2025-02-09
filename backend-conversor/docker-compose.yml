@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 services:
   app1:
     build: .
@@ -7,7 +7,8 @@ services:
     depends_on:
       - rabbitmq
     ports:
-      - "4000:4000" # Expondo a porta 4000
+      - "4000:4000"
+    restart: always
 
   app2:
     build: .
@@ -16,7 +17,8 @@ services:
     depends_on:
       - rabbitmq
     ports:
-      - "4000:4001"  # Porta externa 4000 mapeada para porta interna 4001 do app2 (porta interna diferente)
+      - "4001:4000"
+    restart: always
 
   worker1:
     build: .
@@ -24,6 +26,7 @@ services:
     command: node worker.js
     depends_on:
       - rabbitmq
+    restart: always
 
   worker2:
     build: .
@@ -31,6 +34,7 @@ services:
     command: node worker.js
     depends_on:
       - rabbitmq
+    restart: always
 
   nginx:
     image: nginx:alpine
@@ -41,9 +45,14 @@ services:
     depends_on:
       - app1
       - app2
+    restart: always
 
   rabbitmq:
     image: rabbitmq:management
     ports:
-      - "5672:5672" # Porta para comunicação AMQP
-      - "15672:15672" # Interface de gerenciamento do RabbitMQ
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    restart: always
